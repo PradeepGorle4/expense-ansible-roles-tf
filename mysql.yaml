@@ -1,0 +1,7 @@
+- name: configuring mysql server
+  hosts: mysql
+  become: yes
+  # vars_files: # since we commented our password from vars main.yaml, we will need to inform to take the password from vault.yaml using this.
+  # - roles/mysql/vars/vault.yaml
+  roles:
+  - mysql

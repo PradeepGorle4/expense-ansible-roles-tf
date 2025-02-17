@@ -1,0 +1,3 @@
+dependencies:
+- role: common # Here, ansible check meta before running whole scirpt, here it say backend is dependent on common role,
+# so if common not present, the script throws error at the start itself which is better.

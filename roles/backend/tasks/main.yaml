@@ -1,0 +1,75 @@
+- name: disable nodejs current version
+  ansible.builtin.command: "dnf module disable nodejs -y"
+
+- name: enable nodejs 20
+  ansible.builtin.command: "dnf module enable nodejs:20 -y"
+
+- name: install nodejs 20 and mysql
+  ansible.builtin.package:
+    name: " {{ item }} "
+    state: installed
+  loop:
+  - nodejs
+  - mysql
+
+- name: add expense user
+  ansible.builtin.user:
+    user: expense
+
+- name: include from common role
+  include_role:
+    name: common
+    tasks_from: main
+    
+
+# - name: creating app directory
+#   ansible.builtin.file:
+#     path: /app
+#     state: directory
+
+# - name: downloading application content
+#   ansible.builtin.get_url:
+#     url: https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip
+#     dest: /tmp/backend.zip
+
+# - name: Unzipping the content in app directory
+#   ansible.builtin.unarchive:
+#     src: /tmp/backend.zip
+#     dest: /app
+#     remote_src: yes # This Ansible module thinks by default the /tmp/backend.zip is in controller m/c. so we tell that it is in local.
+
+- name: installing NojeJs dependencies
+  community.general.npm:
+    path: /app
+
+# Since this file has variable, It is placed in templates folder with jinga2 format- service file with j2 extention. and use template module.
+# If no variables, create files folder and place the service file there since copy modules checks in files folder by default
+
+- name: Copy backend service
+  ansible.builtin.template: # instead of.copy we used .template as this will search in templates folder for the service file
+    src: /home/ec2-user/expense-ansible-roles/roles/backend/templates/backend.service.j2
+    dest: /etc/systemd/system/backend.service
+
+- name: install python Libraries
+  ansible.builtin.pip:
+    name: " {{ item }} "
+    executable: pip3.9
+  loop:
+  - PyMySQL
+  - cryptography
+
+- name: import mysql data
+  community.mysql.mysql_db:
+    state: import
+    name: all
+    login_user: "{{ mysql_user }}"
+    login_password: "{{ mysql_password }}"
+    login_host: "{{ mysql_host }}"
+    target: /app/schema/backend.sql
+
+- name: Restart backend service and Reload the daemon
+  ansible.builtin.systemd_service:
+    name: backend
+    enabled: true
+    state: restarted
+    daemon_reload: true
