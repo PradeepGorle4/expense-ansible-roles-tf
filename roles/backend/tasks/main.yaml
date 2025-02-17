@@ -47,7 +47,7 @@
 
 - name: Copy backend service
   ansible.builtin.template: # instead of.copy we used .template as this will search in templates folder for the service file
-    src: /home/ec2-user/expense-ansible-roles/roles/backend/templates/backend.service.j2
+    src: backend.service.j2
     dest: /etc/systemd/system/backend.service
 
 - name: install python Libraries
