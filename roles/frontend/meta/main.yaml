@@ -1,3 +1,6 @@
-dependencies:
-- role: common # Here, ansible check meta before running whole scirpt, here it say frontend is dependent on common role,
-# so if common not present, the script throws error at the start itself which is better.
+# dependencies:
+# - role: common # Here, ansible check meta before running whole scirpt, here it say frontend is dependent on common role,
+# # so if common not present, the script throws error at the start itself which is better.
+
+# Commenting this as this takes first preference while running tasks, since nginx itself is not installed, we do not know if the
+# /usr/share/nginx/html dir is created or not, so commenting this out
