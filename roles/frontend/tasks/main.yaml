@@ -16,7 +16,7 @@
 
 - name: Copying the expense Config
   ansible.builtin.template:
-    src: /home/ec2-user/expense-ansible-roles-tf/roles/frontend/templates/expense.conf.j2
+    src: expense.conf.j2
     dest: /etc/nginx/default.d/expense.conf
   notify:
   - Restart nginx # This is the name of handler
